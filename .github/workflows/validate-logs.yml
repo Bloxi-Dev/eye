@@ -16,6 +16,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     name: Validate Log Entry Schema
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
