@@ -1,0 +1,13 @@
+# CODEOWNERS - Restrict write access to logs directory
+# Only repository admins and maintainers listed here can approve changes to logs
+
+# Default owners for everything in the repo
+* @Bloxi-Dev
+
+# Logs directory - requires approval from maintainers
+/logs/ @Bloxi-Dev
+/logs/** @Bloxi-Dev
+
+# Schema file - requires approval from maintainers
+/schema/ @Bloxi-Dev
+/schema/** @Bloxi-Dev

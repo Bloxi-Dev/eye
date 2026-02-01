@@ -1,0 +1,12 @@
+{
+  "id": "example-001",
+  "timestamp": "2026-02-01T08:54:22.369Z",
+  "type": "info",
+  "message": "Example log entry demonstrating the schema",
+  "service": "eye-database",
+  "metadata": {
+    "user": "system",
+    "action": "initialization"
+  },
+  "tags": ["example", "documentation"]
+}

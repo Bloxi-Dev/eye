@@ -1,0 +1,14 @@
+{
+  "id": "warning-example-004",
+  "timestamp": "2026-02-01T11:05:42.789Z",
+  "type": "warning",
+  "message": "API rate limit approaching threshold",
+  "service": "api-gateway",
+  "metadata": {
+    "current_rate": 950,
+    "limit": 1000,
+    "window": "60s",
+    "client_id": "client_abc123"
+  },
+  "tags": ["rate-limit", "performance", "monitoring"]
+}
