@@ -1,0 +1,106 @@
+name: Validate Log Entries
+
+on:
+  pull_request:
+    paths:
+      - 'logs/**'
+      - 'schema/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'logs/**'
+      - 'schema/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Log Entry Schema
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install AJV JSON Schema Validator
+        run: npm install -g ajv-cli ajv-formats
+        
+      - name: Validate all log entries
+        run: |
+          echo "Validating log entries against schema..."
+          SCHEMA_FILE="schema/log-entry.json"
+          FAILED=0
+          
+          if [ ! -f "$SCHEMA_FILE" ]; then
+            echo "Error: Schema file not found at $SCHEMA_FILE"
+            exit 1
+          fi
+          
+          for log_file in logs/*.json; do
+            if [ -f "$log_file" ]; then
+              echo "Validating: $log_file"
+              if ! ajv validate -s "$SCHEMA_FILE" -d "$log_file" --spec=draft7 --strict=false; then
+                echo "❌ Validation failed for $log_file"
+                FAILED=1
+              else
+                echo "✅ $log_file is valid"
+              fi
+            fi
+          done
+          
+          if [ $FAILED -eq 1 ]; then
+            echo "One or more log entries failed validation"
+            exit 1
+          fi
+          
+          echo "All log entries are valid!"
+          
+      - name: Check for duplicate IDs
+        run: |
+          echo "Checking for duplicate log IDs..."
+          
+          # Extract all IDs from JSON files
+          IDS=$(find logs -name "*.json" -exec jq -r '.id' {} \;)
+          
+          # Check for duplicates
+          DUPLICATES=$(echo "$IDS" | sort | uniq -d)
+          
+          if [ -n "$DUPLICATES" ]; then
+            echo "❌ Error: Duplicate log IDs found:"
+            echo "$DUPLICATES"
+            exit 1
+          fi
+          
+          echo "✅ No duplicate IDs found!"
+          
+      - name: Verify filename matches ID
+        run: |
+          echo "Verifying filenames match log IDs..."
+          FAILED=0
+          
+          for log_file in logs/*.json; do
+            if [ -f "$log_file" ]; then
+              FILENAME=$(basename "$log_file" .json)
+              LOG_ID=$(jq -r '.id' "$log_file")
+              
+              if [ "$FILENAME" != "$LOG_ID" ]; then
+                echo "❌ Mismatch: File $log_file has ID '$LOG_ID' but filename is '$FILENAME'"
+                FAILED=1
+              else
+                echo "✅ $log_file matches ID"
+              fi
+            fi
+          done
+          
+          if [ $FAILED -eq 1 ]; then
+            echo "One or more files have mismatched IDs"
+            exit 1
+          fi
+          
+          echo "All filenames match their IDs!"

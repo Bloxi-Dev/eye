@@ -1,0 +1,14 @@
+{
+  "id": "audit-example-003",
+  "timestamp": "2026-02-01T10:22:15.456Z",
+  "type": "audit",
+  "message": "User login successful",
+  "service": "authentication",
+  "metadata": {
+    "user": "admin",
+    "ip": "192.168.1.100",
+    "action": "login",
+    "method": "oauth2"
+  },
+  "tags": ["security", "authentication", "success"]
+}
